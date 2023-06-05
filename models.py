@@ -52,6 +52,7 @@ class Checks(Base):
     __tablename__ = 'od_purchase'
 
     id = Column(Integer, primary_key=True)
+    numberfield = Column(Integer)
     datecreate = Column(DateTime)
     datecommit = Column(DateTime)
     checkstatus = Column(Integer)

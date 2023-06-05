@@ -10,12 +10,11 @@ class ExcelExporter:
         workbook = openpyxl.Workbook()
         return workbook
 
-    def write_data(self, data, sheet):
+    def write_data(self, title, data, sheet):
         ws = self.workbook[sheet]
-        title = ['Номер чека', 'Номер магазина', 'Касса', 'Смена', 'Кассир', 'Скорость чека в сек.', 'Сумма чека в руб.', 'Дата',
-                 'Время позиции', 'Количество', 'Цена']
+
         ws.append(title)
-        for row in data:
+        for row in sorted(data, key=lambda x: x[1]):
             ws.append(row)
 
     def save_workbook(self):
@@ -25,7 +24,7 @@ class ExcelExporter:
         wss = self.workbook.sheetnames
         return wss[0]
 
-    def export_to_excel(self, data):
+    def export_to_excel(self, title, data):
         sheet = self.get_sheet_name()
-        self.write_data(data, sheet)
+        self.write_data(title, data, sheet)
         self.save_workbook()
