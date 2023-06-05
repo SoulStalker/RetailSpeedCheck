@@ -45,6 +45,7 @@ class Position(Base):
     id = Column(Integer, primary_key=True)
     datecommit = Column(DateTime)
     priceend = Column(Integer)
+    qnty = Column(Integer)
     id_purchase = Column(Integer, ForeignKey('od_purchase.id'))
 
 class Checks(Base):
