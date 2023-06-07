@@ -36,6 +36,8 @@ class Session(Base):
     id = Column(Integer, primary_key=True)
     cashnum = Column(Integer)
     shopnum = Column(Integer)
+    datebegin = Column(DateTime)
+    dateend = Column(DateTime)
     id_user = Column(Integer, ForeignKey('od_user.tabnum'))
 
 

@@ -16,7 +16,7 @@ results = db.query(Checks, Position, Session, User, Shift).select_from(Checks). 
 cashier_data = {}
 
 for check, position, session, user, shift in results:
-    cashier_key = (user.tabnum, f'{user.lastname} {user.firstname[0]}.')
+    cashier_key = (user.tabnum, f'{user.lastname} {user.firstname[0]}.{user.middlename[0]}.')
     if check.id not in cashier_data.get(cashier_key, {}).get('checks', []):
         if cashier_key in cashier_data:
             cashier_info = cashier_data[cashier_key]
@@ -43,6 +43,7 @@ summary_data = []
 for cashier_key, cashier_info in cashier_data.items():
     cashier = cashier_key[1:]
     date = cashier_info['date']
+    worked_hours = 12
     total_check_count = cashier_info['total_check_count']
     total_check_sum = cashier_info['total_check_sum'] / 100
     check_speed = round(cashier_info['check_speed'] / total_check_count, 0)
@@ -51,10 +52,10 @@ for cashier_key, cashier_info in cashier_data.items():
     position_speed = round(cashier_info['position_speed'] / positions, 2)
 
     row = cashier + (date, position_speed, check_speed, total_check_count,
-                     total_check_sum, average_check)
+                     worked_hours, total_check_sum, average_check)
     summary_data.append(row)
 
 title = ['Кассир', 'Дата', 'Средняя скорость позиции', 'Средняя скорость чека',
-         'Количество чеков', 'Оборот руб.', 'Средний чек']
+         'Количество чеков', 'Отработано часов', 'Оборот руб.', 'Средний чек']
 summary_excel = ExcelExporter('summary.xlsx')
 summary_excel.export_to_excel(title, summary_data)
