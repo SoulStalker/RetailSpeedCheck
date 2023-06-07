@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import declarative_base, relationship
 
 
@@ -57,7 +57,7 @@ class Checks(Base):
     datecommit = Column(DateTime)
     checkstatus = Column(Integer)
     checksumend = Column(Integer)
-    operationtype = Column(Integer)
+    operationtype = Column(Boolean)
     cash_operation = Column(Integer)
     id_shift = Column(Integer, ForeignKey('od_shift.id'))
     id_session = Column(Integer, ForeignKey('od_session.id'))
