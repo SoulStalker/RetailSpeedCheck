@@ -4,13 +4,16 @@ from excel import ExcelExporter
 
 from database import db
 from models import Checks, User, Session, Shift, Position
+from config import se
+
+operation_day = '2023-05-28'
 
 results = db.query(Checks, Position, Session, User, Shift).select_from(Checks). \
     join(Position, Checks.id == Position.id_purchase). \
     join(Shift, Checks.id_shift == Shift.id). \
     join(Session, Checks.id_session == Session.id). \
     join(User, and_(Session.id_user == User.tabnum, User.shop == Shift.shopindex)). \
-    filter(Shift.operday == '2023-05-28', Shift.shopindex == 1, Checks.checkstatus == 0). \
+    filter(Shift.operday == operation_day, Shift.shopindex == 1, Checks.checkstatus == 0). \
     order_by(Checks.id).all()
 
 cashier_data = {}
@@ -28,6 +31,7 @@ for check, position, session, user, shift in results:
             cashier_info['position_speed'] += timedelta.total_seconds(position.datecommit - check.datecreate)
         else:
             cashier_info = {
+                'shop_num': shift.shopindex,
                 'total_check_sum': check.checksumend,
                 'total_check_count': 1,
                 'checks': [check.id],
@@ -41,6 +45,7 @@ for check, position, session, user, shift in results:
 summary_data = []
 
 for cashier_key, cashier_info in cashier_data.items():
+    shop_number = cashier_info['shop_num']
     cashier = cashier_key[1:]
     date = cashier_info['date']
     worked_hours = 12
@@ -51,11 +56,11 @@ for cashier_key, cashier_info in cashier_data.items():
     positions = cashier_info['total_positions']
     position_speed = round(cashier_info['position_speed'] / positions, 2)
 
-    row = cashier + (date, position_speed, check_speed, total_check_count,
+    row = cashier + (shop_number, se[shop_number], date, position_speed, check_speed, total_check_count,
                      worked_hours, total_check_sum, average_check)
     summary_data.append(row)
 
-title = ['Кассир', 'Дата', 'Средняя скорость позиции', 'Средняя скорость чека',
+title = ['Кассир', 'Номер', 'Магазин', 'Дата', 'Средняя скорость позиции', 'Средняя скорость чека',
          'Количество чеков', 'Отработано часов', 'Оборот руб.', 'Средний чек']
-summary_excel = ExcelExporter('summary.xlsx')
+summary_excel = ExcelExporter(f'{operation_day}.xlsx')
 summary_excel.export_to_excel(title, summary_data)
