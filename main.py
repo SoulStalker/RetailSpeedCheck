@@ -6,7 +6,7 @@ from database import db
 from models import Checks, User, Session, Shift, Position
 from config import se
 
-operation_day = '2023-05-28'
+operation_day = '2023-05-30'
 
 results = db.query(Checks, Position, Session, User, Shift).select_from(Checks). \
     join(Position, Checks.id == Position.id_purchase). \
@@ -19,7 +19,10 @@ results = db.query(Checks, Position, Session, User, Shift).select_from(Checks). 
 cashier_data = {}
 
 for check, position, session, user, shift in results:
-    cashier_key = (user.tabnum, f'{user.lastname} {user.firstname[0]}.{user.middlename[0]}.')
+    full_name = user.lastname
+    full_name += ' ' + user.firstname[0] + '.' if user.firstname else ''
+    full_name += ' ' + user.middlename[0] + '.' if user.middlename else ''
+    cashier_key = (user.tabnum, full_name)
     if check.id not in cashier_data.get(cashier_key, {}).get('checks', []):
         if cashier_key in cashier_data:
             cashier_info = cashier_data[cashier_key]
