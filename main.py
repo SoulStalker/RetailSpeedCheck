@@ -14,20 +14,27 @@ class DataAnalyzer:
         self.cashier_data = None
         self.summary_data = None
 
-    def get_results(self, shop_index):
-        self.results = db.query(Checks, Position, Session, User, Shift).select_from(Checks). \
+    def get_results(self, shop_index=None):
+        query = db.query(Checks, Position, Session, User, Shift).select_from(Checks). \
             join(Position, Checks.id == Position.id_purchase). \
             join(Shift, Checks.id_shift == Shift.id). \
             join(Session, Checks.id_session == Session.id). \
             join(User, and_(Session.id_user == User.tabnum, User.shop == Shift.shopindex)). \
-            filter(Shift.operday == self.operation_day, Shift.shopindex == shop_index, Checks.checkstatus == 0). \
-            order_by(Checks.id).all()
+            filter(Shift.operday == self.operation_day, Checks.checkstatus == 0)
+
+        if shop_index is not None:
+            query = query.filter(Shift.shopindex == shop_index)
+
+        self.results = query.order_by(Checks.id).all()
 
     def calculate_cashier_data(self):
         self.cashier_data = {}
 
         for check, position, session, user, shift in self.results:
-            cashier_key = (user.tabnum, f'{user.lastname} {user.firstname[0]}.{user.middlename[0]}.')
+            full_name = user.lastname
+            full_name += ' ' + user.firstname[0] + '.' if user.firstname else ''
+            full_name += ' ' + user.middlename[0] + '.' if user.middlename else ''
+            cashier_key = (user.tabnum, full_name)
             if check.id not in self.cashier_data.get(cashier_key, {}).get('checks', []):
                 if cashier_key in self.cashier_data:
                     cashier_info = self.cashier_data[cashier_key]
@@ -82,7 +89,7 @@ def main():
     operation_day = '2023-05-29'
 
     analyzer = DataAnalyzer(operation_day)
-    analyzer.get_results(shop_index=1)
+    analyzer.get_results(shop_index=23)
     analyzer.calculate_cashier_data()
     analyzer.generate_summary_data()
     analyzer.export_summary_to_excel()
