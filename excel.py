@@ -18,12 +18,6 @@ class ExcelExporter:
     def save_workbook(self):
         self.workbook.save(self.filename)
 
-    # def get_sheet_name(self):
-    #     wss = self.workbook.sheetnames
-    #     return wss[0]
-
     def export_to_excel(self, title, data, sheet):
-        # sheet = self.get_sheet_name()
-
         self.write_data(title, data, sheet)
         self.save_workbook()

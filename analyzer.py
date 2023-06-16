@@ -11,6 +11,7 @@ class DataAnalyzer:
     """
     Класс для анализа данных из запроса к базе
     """
+
     def __init__(self, operation_day):
         self.operation_day = operation_day
         self.results = None
@@ -100,10 +101,6 @@ class DataAnalyzer:
         title = ['Кассир', 'Номер', 'Магазин', 'Дата', 'Средняя скорость позиции', 'Средняя скорость чека',
                  'Количество чеков', 'Отработано часов', 'Оборот руб.', 'Средний чек']
 
-        # filename = f'{self.operation_day}-sum.xlsx'
-
-        # exporter.export_to_excel(title, self.summary_data)
-
         if isinstance(self.operation_day, str):
             sheet_name = self.operation_day
             exporter.export_to_excel(title, self.summary_data, sheet_name)
@@ -114,9 +111,13 @@ class DataAnalyzer:
 
         exporter.save_workbook()
 
-def main():
-    operation_day = '2023-05-29'
 
+def main():
+    """
+    Запуск анализа для проверки. Основной запуск из main.py
+    :return:
+    """
+    operation_day = '2023-05-29'
     analyzer = DataAnalyzer(operation_day)
     analyzer.get_results(shop_index=23)
     analyzer.calculate_cashier_data()
