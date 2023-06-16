@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from sqlalchemy import and_
 
 from config import se
@@ -92,7 +92,7 @@ class DataAnalyzer:
                              worked_hours, total_check_sum, average_check)
             self.summary_data.append(row)
 
-    def export_summary_to_excel(self):
+    def export_summary_to_excel(self, exporter):
         """
         Добавление заголовка таблицы.
         :return: Отправка данных на выгрузку в Excel.
@@ -100,10 +100,19 @@ class DataAnalyzer:
         title = ['Кассир', 'Номер', 'Магазин', 'Дата', 'Средняя скорость позиции', 'Средняя скорость чека',
                  'Количество чеков', 'Отработано часов', 'Оборот руб.', 'Средний чек']
 
-        filename = f'{self.operation_day}.xlsx'
-        exporter = ExcelExporter(filename)
-        exporter.export_to_excel(title, self.summary_data)
+        # filename = f'{self.operation_day}-sum.xlsx'
 
+        # exporter.export_to_excel(title, self.summary_data)
+
+        if isinstance(self.operation_day, str):
+            sheet_name = self.operation_day
+            exporter.export_to_excel(title, self.summary_data, sheet_name)
+        elif isinstance(self.operation_day, datetime):
+            for day_summary in self.summary_data:
+                sheet_name = day_summary[3]
+                exporter.export_to_excel(title, [day_summary], sheet_name)
+
+        exporter.save_workbook()
 
 def main():
     operation_day = '2023-05-29'
